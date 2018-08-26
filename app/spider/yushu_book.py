@@ -1,5 +1,5 @@
-from httper import HTTP
-
+from app.libs.httper import HTTP
+from flask import current_app
 
 class YuShuBook:
     isbn_url = 'http://t.yushu.im/v2/book/isbn/{}'
@@ -11,7 +11,12 @@ class YuShuBook:
         result = HTTP.get(url)
         return result
 
-    def search_by_keyword(cls, keyword, count=15, start=0):
-        url = cls.keyword_url.format(keyword,count,start)
+    @classmethod
+    def search_by_keyword(cls, keyword, page=1):
+        url = cls.keyword_url.format(keyword, current_app.config['PER_PAGE'],cls.calculate_start(page))
         result = HTTP.get(url)
         return result
+
+    @staticmethod
+    def calculate_start(page):
+        return (page - 1) * current_app.config['PER_PAGE']
